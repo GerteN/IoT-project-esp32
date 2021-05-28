@@ -49,7 +49,7 @@ const long timeoutTime = 2000;
 void setup() {
   Serial.begin(115200);
   
-  if(!SPIFFS.begin(true)){
+  /*if(!SPIFFS.begin(true)){
     Serial.println("An Error has occurred while mounting SPIFFS");
     return;
     }
@@ -59,14 +59,10 @@ void setup() {
     return;
     }
   // random sensors data
-  for(int i=0; i<10; i++){
-      String val = String(25+i);
-      String val2 = String((15+(2*i))/2);
-      file.println(val);
-      file.println("37.511520, 15.084343");
-      file.println(val2);
-    }
-   file.close();
+  file.println(String(random(25,50)));
+  file.println("37.511520, 15.084343");
+  file.println(String(random(50)));
+  file.close();*/
  
 
   // Connesione con il wifiConnect to Wi-Fi network with SSID and password
@@ -124,7 +120,7 @@ void loop(){
               DynamicJsonDocument jsondata(1024);
               //creating json string to send
               //from the basic json object we've created 3 json array containing temp, speed and coords
-              JsonArray temp = jsondata.createNestedArray("temperatures");
+              /*JsonArray temp = jsondata.createNestedArray("temperatures");
               JsonArray spee = jsondata.createNestedArray("speed");
               JsonArray coord = jsondata.createNestedArray("coordinates");
               //let's open the file containg all data and add everything inside the arrays
@@ -139,10 +135,13 @@ void loop(){
                 file.read();
               }
               //file ended, we'll format everything to send the json object as response
-              file.close();
+              file.close();*/
               timeClient.forceUpdate();
               formattedDate = timeClient.getFormattedDate();
               jsondata["timestamp"] = serialized(formattedDate);
+              jsondata["temperatures"] = serialized(String(random(25,50)));
+              jsondata["speed"] = serialized(String(random(50)));
+              jsondata["coordinates"] = serialized("37.511520, 15.084343");
               serializeJson(jsondata, response);
               Serial.println("json data: "+ response);
             }
