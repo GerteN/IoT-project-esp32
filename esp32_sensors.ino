@@ -26,7 +26,6 @@ String timeStamp;
 HTTPServer insecureServer = HTTPServer();
 
 // Declare some handler functions for the various URLs on the server
-void handleRoot(HTTPRequest * req, HTTPResponse * res);
 void handle404(HTTPRequest * req, HTTPResponse * res);
 void handleAll(HTTPRequest * req, HTTPResponse * res);
 
