@@ -1,7 +1,6 @@
 #define WIFI_SSID "INSERT SSID HERE"
 #define WIFI_PSK  "INSERT PASSWORD HERE"
 
-
 // We will use wifi
 #include <WiFi.h>
 #include <vector>
@@ -12,7 +11,7 @@
 #include <HTTPServer.hpp>
 #include <HTTPRequest.hpp>
 #include <HTTPResponse.hpp>
-#include <NTPClient.h>
+#include "NTPClient.h"
 #include <WiFiUdp.h>
 
 WiFiUDP ntpUDP;
@@ -23,11 +22,13 @@ String timeStamp;
 
 
 // We create an HTTPServer
+using namespace httpsserver;
 HTTPServer insecureServer = HTTPServer();
 
 // Declare some handler functions for the various URLs on the server
 void handle404(HTTPRequest * req, HTTPResponse * res);
 void handleAll(HTTPRequest * req, HTTPResponse * res);
+void handleId(HTTPRequest * req, HTTPResponse * res);
 
 void setup() {
   // For logging
@@ -47,12 +48,12 @@ void setup() {
   timeClient.begin();
   timeClient.setTimeOffset(7200);
 
-  // Create a ResourceNode to handle requests from "/all"
+  // Create a ResourceNode to handle requests from "/all" and "/id"
   // Create a 404 ResourceNode (that would be the deafult node)
   ResourceNode * all = new ResourceNode("/all", "GET", &handleAll);
   ResourceNode * node404  = new ResourceNode("", "GET", &handle404);
-
-  // Add the root node to the server
+  ResourceNode * id  = new ResourceNode("/id", "GET", &handleId);
+  insecureServer.registerNode(id);
   insecureServer.registerNode(all);
 
   // We do the same for the default Node
@@ -70,17 +71,24 @@ void loop() {
   delay(1);
 }
 
+void handleId(HTTPRequest * req, HTTPResponse * res){
+  res->setHeader("Content-type", "text/html");
+  res->println("1");
+}
+
 
 
 void handleAll(HTTPRequest * req, HTTPResponse * res){
     String response;
     res->setHeader("Content-type", "application/json");
     DynamicJsonDocument jsondata(1024);
+    jsondata["ID"] = serialized(String("1"));
     JsonObject coord  = jsondata.createNestedObject("coordinates");
     coord["latitude"] = serialized("37.511520");
     coord["longitude"] = serialized("15.084343");
     timeClient.forceUpdate();
     formattedDate = timeClient.getFormattedDate();
+ 
     jsondata["timestamp"] = String(formattedDate);
     jsondata["temperatures"] = serialized(String(random(25,50)));
     jsondata["speed"] = serialized(String(random(50)));
