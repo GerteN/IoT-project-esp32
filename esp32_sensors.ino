@@ -11,7 +11,7 @@
 #include <HTTPServer.hpp>
 #include <HTTPRequest.hpp>
 #include <HTTPResponse.hpp>
-#include "NTPClient.h"
+#include <NTPClient.h>
 #include <WiFiUdp.h>
 
 WiFiUDP ntpUDP;
@@ -22,7 +22,6 @@ String timeStamp;
 
 
 // We create an HTTPServer
-using namespace httpsserver;
 HTTPServer insecureServer = HTTPServer();
 
 // Declare some handler functions for the various URLs on the server
