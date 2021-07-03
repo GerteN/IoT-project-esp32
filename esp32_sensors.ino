@@ -81,7 +81,7 @@ void handleAll(HTTPRequest * req, HTTPResponse * res){
     String response;
     res->setHeader("Content-type", "application/json");
     DynamicJsonDocument jsondata(1024);
-    jsondata["ID"] = serialized(String("1"));
+    jsondata["ID"] = "1";
     JsonObject coord  = jsondata.createNestedObject("coordinates");
     coord["latitude"] = serialized("37.511520");
     coord["longitude"] = serialized("15.084343");
