@@ -26,7 +26,8 @@ HTTPServer insecureServer = HTTPServer();
 
 // Declare some handler functions for the various URLs on the server
 void handle404(HTTPRequest * req, HTTPResponse * res);
-void handleAll(HTTPRequest * req, HTTPResponse * res);
+void handleAll1(HTTPRequest * req, HTTPResponse * res);
+void handleAll2(HTTPRequest * req, HTTPResponse * res);
 void handleId(HTTPRequest * req, HTTPResponse * res);
 
 void setup() {
@@ -49,11 +50,13 @@ void setup() {
 
   // Create a ResourceNode to handle requests from "/all" and "/id"
   // Create a 404 ResourceNode (that would be the deafult node)
-  ResourceNode * all = new ResourceNode("/all", "GET", &handleAll);
+  ResourceNode * all1 = new ResourceNode("/all/1", "GET", &handleAll1);
+  ResourceNode * all2 = new ResourceNode("/all/2", "GET", &handleAll2);
   ResourceNode * node404  = new ResourceNode("", "GET", &handle404);
   ResourceNode * id  = new ResourceNode("/id", "GET", &handleId);
   insecureServer.registerNode(id);
-  insecureServer.registerNode(all);
+  insecureServer.registerNode(all1);
+  insecureServer.registerNode(all2);
 
   // We do the same for the default Node
   insecureServer.setDefaultNode(node404);
@@ -72,24 +75,55 @@ void loop() {
 
 void handleId(HTTPRequest * req, HTTPResponse * res){
   res->setHeader("Content-type", "text/html");
-  res->println("1");
+  if(first){
+    res->println("1");
+    first = false;
+  }
+  else{
+    res->println("2");
+    first = true;
+  }
+  
 }
 
 
 
-void handleAll(HTTPRequest * req, HTTPResponse * res){
+void handleAll1(HTTPRequest * req, HTTPResponse * res){
     String response;
     res->setHeader("Content-type", "application/json");
     DynamicJsonDocument jsondata(1024);
-    jsondata["ID"] = "1";
+    jsondata["ID"] = String("1");
     JsonObject coord  = jsondata.createNestedObject("coordinates");
+    JsonObject temps  = jsondata.createNestedObject("temperatures");
     coord["latitude"] = serialized("37.511520");
     coord["longitude"] = serialized("15.084343");
     timeClient.forceUpdate();
     formattedDate = timeClient.getFormattedDate();
  
     jsondata["timestamp"] = String(formattedDate);
-    jsondata["temperatures"] = serialized(String(random(25,50)));
+    temps["vagone1"] = serialized(String(random(25,50)));
+    temps["vagone2"] = serialized(String(random(25,50)));
+    jsondata["speed"] = serialized(String(random(50)));
+    serializeJson(jsondata, response);
+    Serial.println("json data: "+ response);
+    res->println(response);
+}
+
+void handleAll2(HTTPRequest * req, HTTPResponse * res){
+    String response;
+    res->setHeader("Content-type", "application/json");
+    DynamicJsonDocument jsondata(1024);
+    jsondata["ID"] = String("2");
+    JsonObject coord  = jsondata.createNestedObject("coordinates");
+    JsonObject temps  = jsondata.createNestedObject("temperatures");
+    coord["latitude"] = serialized("40.511520");
+    coord["longitude"] = serialized("15.084343");
+    timeClient.forceUpdate();
+    formattedDate = timeClient.getFormattedDate();
+ 
+    jsondata["timestamp"] = String(formattedDate);
+    temps["vagone1"] = serialized(String(random(25,50)));
+    temps["vagone2"] = serialized(String(random(25,50)));
     jsondata["speed"] = serialized(String(random(50)));
     serializeJson(jsondata, response);
     Serial.println("json data: "+ response);
